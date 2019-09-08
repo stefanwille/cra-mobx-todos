@@ -1,14 +1,26 @@
 .App {
-  padding: 40px;
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    padding: 40px;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-size: calc(10px + 2vmin);
+    line-height: calc(10px + 2vmin);
+    color: white;
 }
 
 a {
-  color: #61dafb;
+    color: #61dafb;
 }
 
+.todo {
+    display: flex;
+    align-items: center;
+}
+
+.delete-button {
+    display: inline-block;
+    margin-left: 10px;
+    width: calc(10px + 1.0vmin);
+    height: calc(10px + 1.0vmin);
+}

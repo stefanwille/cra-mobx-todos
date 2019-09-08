@@ -12,95 +12,94 @@ const useStore = () => useContext(StoreContext);
 const useTodoStore = () => useStore().todoStore;
 
 const AddTodo = () => {
-	const todoStore = useTodoStore();
-	const [ todo, setTodo ] = useState('Neu');
-	const handleChange = (event) => {
-		setTodo(event.target.value);
-	};
-	const submitTodo = () => {
-		todoStore.addTodo(todo);
-	};
-	const handleKeyPress = (event) => {
-		if (event.key === 'Enter') {
-			submitTodo();
-		}
-	};
-	return (
-		<div>
-			<input type="text" value={todo} onChange={handleChange} onKeyPress={handleKeyPress} />{' '}
-			<button onClick={submitTodo}>OK</button>
-		</div>
-	);
+    const todoStore = useTodoStore();
+    const [ text, setText ] = useState('New todo');
+    const handleTextChange = (event) => {
+        setText(event.target.value);
+    };
+    const submitTodo = () => {
+        todoStore.addTodo(text);
+    };
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            submitTodo();
+        }
+    };
+    return (
+        <div>
+            <input type="text" value={text} onChange={handleTextChange} onKeyPress={handleKeyPress} />{' '}
+            <button onClick={submitTodo}>OK</button>
+        </div>
+    );
 };
 
 const DeleteButton = ({ index }) => {
-	const todoStore = useTodoStore();
-	const handleDeleteClick = () => {
-		todoStore.delete(index);
-	};
-	return <button onClick={handleDeleteClick}>X</button>;
+    const todoStore = useTodoStore();
+    const handleDeleteClick = () => {
+        todoStore.delete(index);
+    };
+    return (
+        <button className="delete-button" onClick={handleDeleteClick}>
+            X
+        </button>
+    );
 };
 
 const NumberOfTodos = () => {
-	const todoStore = useTodoStore();
-	return <h5>{todoStore.todoCount} Todos</h5>;
+    const todoStore = useTodoStore();
+    return <h5>You have {todoStore.todoCount} Todos</h5>;
 };
 
 const TodoList = observer(() => {
-	const todoStore = useTodoStore();
-	return (
-		<div>
-			<ol>
-				{todoStore.todos.map((todo, index) => (
-					<li key={index}>
-						{todo} <DeleteButton index={index} />
-					</li>
-				))}
-			</ol>
-			<NumberOfTodos />
-			<AddTodo />
-		</div>
-	);
+    const todoStore = useTodoStore();
+    return (
+        <div>
+            <ol>
+                {todoStore.todos.map((todo, index) => (
+                    <li key={index} className="todo">
+                        {todo} <DeleteButton index={index} />
+                    </li>
+                ))}
+            </ol>
+            <NumberOfTodos />
+            <AddTodo />
+        </div>
+    );
 });
 
-const deleteFromArray = (array, index) => array.slice(0, index).concat(array.slice(index + 1));
-
 const todoStore = observable(
-	{
-		todos: [ 'Buy milk', 'Write book' ],
-		get todoCount() {
-			return this.todos.length;
-		},
+    {
+        todos: [ 'Buy milk', 'Write book' ],
+        get todoCount() {
+            return this.todos.length;
+        },
 
-		addTodo(todo) {
-			this.todos.push(todo);
-		},
+        addTodo(todo) {
+            this.todos.push(todo);
+        },
 
-		delete(index) {
-			const newTodos = deleteFromArray(this.todos, index);
-			this.todos = newTodos;
-		}
-	},
-	{
-		addTodo: action.bound,
-		delete: action.bound
-	}
+        delete(index) {
+            this.todos.splice(index, 1);
+        }
+    },
+    {
+        addTodo: action,
+        delete: action
+    }
 );
 
 const stores = {
-	todoStore
+    todoStore
 };
 
 function App() {
-	return (
-		<StoreContext.Provider value={stores}>
-			<div className="App">
-				<a href="https://reactjs.org">Learn React</a>
-
-				<TodoList />
-			</div>
-		</StoreContext.Provider>
-	);
+    return (
+        <StoreContext.Provider value={stores}>
+            <div className="App">
+                <TodoList />
+            </div>
+        </StoreContext.Provider>
+    );
 }
 
 export default App;
