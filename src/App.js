@@ -1,10 +1,10 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import './App.css';
 
 import { configure, observable, action, computed, decorate } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer, useLocalStore, useObserver } from 'mobx-react';
 
-configure({ enforceActions: 'observed' });
+// configure({ enforceActions: 'observed' });
 
 const StoreContext = createContext();
 
@@ -12,24 +12,35 @@ const useStore = () => useContext(StoreContext);
 
 const AddTodo = () => {
     const store = useStore();
-    const [ text, setText ] = useState('New todo');
-    const handleTextChange = (event) => {
-        setText(event.target.value);
-    };
+    const localStore = useLocalStore(() => ({
+        text: 'New todo',
+        setText(text) {
+            this.text = text;
+        }
+    }));
     const submitTodo = () => {
-        store.addTodo(text);
+        store.addTodo(localStore.text);
     };
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
             submitTodo();
         }
     };
-    return (
+    return useObserver(() => (
         <div>
-            <input type="text" value={text} onChange={handleTextChange} onKeyPress={handleKeyPress} />{' '}
+            <input
+                type="text"
+                value={localStore.text}
+                onChange={(event) => {
+                    console.log('setting it', localStore.text);
+                    localStore.setText(event.target.value);
+                    console.log('after', localStore.text);
+                }}
+                onKeyPress={handleKeyPress}
+            />{' '}
             <button onClick={submitTodo}>OK</button>
         </div>
-    );
+    ));
 };
 
 const DeleteButton = ({ index }) => {
@@ -72,7 +83,7 @@ const TodoList = () => {
     );
 };
 
-class TodoStore {
+class Store {
     todos = [ 'Buy milk', 'Write book' ];
 
     get todoCount() {
@@ -88,14 +99,14 @@ class TodoStore {
     }
 }
 
-decorate(TodoStore, {
+decorate(Store, {
     todos: observable,
     todoCount: computed,
     addTodo: action,
     deleteTodo: action
 });
 
-const store = new TodoStore();
+const store = new Store();
 
 const App = () => {
     return (
