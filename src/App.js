@@ -1,7 +1,7 @@
 import React, { useState, createContext, useContext } from 'react';
 import './App.css';
 
-import { configure, observable, action } from 'mobx';
+import { configure, observable, action, computed, decorate } from 'mobx';
 import { observer } from 'mobx-react';
 
 configure({ enforceActions: 'observed' });
@@ -9,16 +9,15 @@ configure({ enforceActions: 'observed' });
 const StoreContext = createContext();
 
 const useStore = () => useContext(StoreContext);
-const useTodoStore = () => useStore().todoStore;
 
 const AddTodo = () => {
-    const todoStore = useTodoStore();
+    const store = useStore();
     const [ text, setText ] = useState('New todo');
     const handleTextChange = (event) => {
         setText(event.target.value);
     };
     const submitTodo = () => {
-        todoStore.addTodo(text);
+        store.addTodo(text);
     };
     const handleKeyPress = (event) => {
         if (event.key === 'Enter') {
@@ -34,9 +33,9 @@ const AddTodo = () => {
 };
 
 const DeleteButton = ({ index }) => {
-    const todoStore = useTodoStore();
+    const store = useStore();
     const handleDeleteClick = () => {
-        todoStore.delete(index);
+        store.deleteTodo(index);
     };
     return (
         <button className="delete-button" onClick={handleDeleteClick}>
@@ -46,15 +45,15 @@ const DeleteButton = ({ index }) => {
 };
 
 const NumberOfTodos = observer(() => {
-    const todoStore = useTodoStore();
-    return <h5>You have {todoStore.todoCount} Todos</h5>;
+    const store = useStore();
+    return <h5>You have {store.todoCount} Todos</h5>;
 });
 
 const ListOfTodos = observer(() => {
-    const todoStore = useTodoStore();
+    const store = useStore();
     return (
         <ol>
-            {todoStore.todos.map((todo, index) => (
+            {store.todos.map((todo, index) => (
                 <li key={index} className="todo">
                     {todo} <DeleteButton index={index} />
                 </li>
@@ -73,39 +72,39 @@ const TodoList = () => {
     );
 };
 
-const todoStore = observable(
-    {
-        todos: [ 'Buy milk', 'Write book' ],
-        get todoCount() {
-            return this.todos.length;
-        },
+class TodoStore {
+    todos = [ 'Buy milk', 'Write book' ];
 
-        addTodo(todo) {
-            this.todos.push(todo);
-        },
-
-        delete(index) {
-            this.todos.splice(index, 1);
-        }
-    },
-    {
-        addTodo: action,
-        delete: action
+    get todoCount() {
+        return this.todos.length;
     }
-);
 
-const stores = {
-    todoStore
-};
+    addTodo(todo) {
+        this.todos.push(todo);
+    }
 
-function App() {
+    deleteTodo(index) {
+        this.todos.splice(index, 1);
+    }
+}
+
+decorate(TodoStore, {
+    todos: observable,
+    todoCount: computed,
+    addTodo: action,
+    deleteTodo: action
+});
+
+const store = new TodoStore();
+
+const App = () => {
     return (
-        <StoreContext.Provider value={stores}>
+        <StoreContext.Provider value={store}>
             <div className="App">
                 <TodoList />
             </div>
         </StoreContext.Provider>
     );
-}
+};
 
 export default App;
