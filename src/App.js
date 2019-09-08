@@ -10,13 +10,10 @@ const StoreContext = createContext();
 
 const useStore = () => useContext(StoreContext);
 
-const AddTodo = () => {
+const AddTodo = observer(() => {
     const store = useStore();
     const localStore = useLocalStore(() => ({
-        text: 'New todo',
-        setText(text) {
-            this.text = text;
-        }
+        text: 'New todo'
     }));
     const submitTodo = () => {
         store.addTodo(localStore.text);
@@ -32,24 +29,24 @@ const AddTodo = () => {
                 type="text"
                 value={localStore.text}
                 onChange={action((event) => {
-                    console.log('setting it', localStore.text);
-                    localStore.setText(event.target.value);
-                    console.log('after', localStore.text);
+                    localStore.text = event.target.value;
                 })}
                 onKeyPress={handleKeyPress}
             />{' '}
             <button onClick={submitTodo}>OK</button>
         </div>
     );
-};
+});
 
 const DeleteButton = ({ index }) => {
     const store = useStore();
-    const handleDeleteClick = () => {
-        store.deleteTodo(index);
-    };
     return (
-        <button className="delete-button" onClick={handleDeleteClick}>
+        <button
+            className="delete-button"
+            onClick={() => {
+                store.deleteTodo(index);
+            }}
+        >
             X
         </button>
     );
