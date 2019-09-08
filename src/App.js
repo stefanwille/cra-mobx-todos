@@ -17,12 +17,9 @@ const AddTodo = observer(() => {
     }));
     const submitTodo = () => {
         store.addTodo(localStore.text);
+        localStore.text = 'New todo';
     };
-    const handleKeyPress = (event) => {
-        if (event.key === 'Enter') {
-            submitTodo();
-        }
-    };
+
     return (
         <div>
             <input
@@ -31,9 +28,13 @@ const AddTodo = observer(() => {
                 onChange={action((event) => {
                     localStore.text = event.target.value;
                 })}
-                onKeyPress={handleKeyPress}
+                onKeyPress={action((event) => {
+                    if (event.key === 'Enter') {
+                        submitTodo();
+                    }
+                })}
             />{' '}
-            <button onClick={submitTodo}>OK</button>
+            <button onClick={action(submitTodo)}>OK</button>
         </div>
     );
 });

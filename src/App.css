@@ -21,8 +21,8 @@ a {
 .delete-button {
     display: inline-block;
     margin-left: 10px;
-    width: calc(7px + 1.0vmin);
-    height: calc(7px + 1.0vmin);
+    width: 30px;
+    height: 30px;
 }
 
 ol {
