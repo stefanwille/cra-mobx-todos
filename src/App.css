@@ -21,6 +21,18 @@ a {
 .delete-button {
     display: inline-block;
     margin-left: 10px;
-    width: calc(10px + 1.0vmin);
-    height: calc(10px + 1.0vmin);
+    width: calc(7px + 1.0vmin);
+    height: calc(7px + 1.0vmin);
+}
+
+ol {
+    list-style: none;
+    counter-reset: my-awesome-counter;
+    padding-left: 20px;
+}
+ol li {
+    counter-increment: my-awesome-counter;
+}
+ol li::before {
+    content: counter(my-awesome-counter) ". ";
 }
