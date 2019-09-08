@@ -45,27 +45,33 @@ const DeleteButton = ({ index }) => {
     );
 };
 
-const NumberOfTodos = () => {
+const NumberOfTodos = observer(() => {
     const todoStore = useTodoStore();
     return <h5>You have {todoStore.todoCount} Todos</h5>;
-};
+});
 
-const TodoList = observer(() => {
+const ListOfTodos = observer(() => {
     const todoStore = useTodoStore();
     return (
+        <ol>
+            {todoStore.todos.map((todo, index) => (
+                <li key={index} className="todo">
+                    {todo} <DeleteButton index={index} />
+                </li>
+            ))}
+        </ol>
+    );
+});
+
+const TodoList = () => {
+    return (
         <div>
-            <ol>
-                {todoStore.todos.map((todo, index) => (
-                    <li key={index} className="todo">
-                        {todo} <DeleteButton index={index} />
-                    </li>
-                ))}
-            </ol>
+            <ListOfTodos />
             <NumberOfTodos />
             <AddTodo />
         </div>
     );
-});
+};
 
 const todoStore = observable(
     {
