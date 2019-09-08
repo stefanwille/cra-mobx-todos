@@ -2,9 +2,9 @@ import React, { createContext, useContext } from 'react';
 import './App.css';
 
 import { configure, observable, action, computed, decorate } from 'mobx';
-import { observer, useLocalStore, useObserver } from 'mobx-react';
+import { observer, useLocalStore } from 'mobx-react';
 
-// configure({ enforceActions: 'observed' });
+configure({ enforceActions: 'observed' });
 
 const StoreContext = createContext();
 
@@ -26,21 +26,21 @@ const AddTodo = () => {
             submitTodo();
         }
     };
-    return useObserver(() => (
+    return (
         <div>
             <input
                 type="text"
                 value={localStore.text}
-                onChange={(event) => {
+                onChange={action((event) => {
                     console.log('setting it', localStore.text);
                     localStore.setText(event.target.value);
                     console.log('after', localStore.text);
-                }}
+                })}
                 onKeyPress={handleKeyPress}
             />{' '}
             <button onClick={submitTodo}>OK</button>
         </div>
-    ));
+    );
 };
 
 const DeleteButton = ({ index }) => {
